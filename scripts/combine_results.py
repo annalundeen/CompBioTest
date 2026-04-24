@@ -13,7 +13,7 @@ os.makedirs(outdir, exist_ok=True)
 blast = pd.read_csv(blast_file, sep="\t")
 meme = pd.read_csv(meme_file, sep="\t")
 
-# ===== BUILD BLAST+MSA ROWS =====
+#build blast + MSA rows
 blast_rows = []
 for _, row in blast.iterrows():
     blast_rows.append({
@@ -27,7 +27,7 @@ for _, row in blast.iterrows():
         "Match": row.get("Aligned_Hit", row.get("Match", ""))
     })
 
-# ===== BUILD MEME ROWS =====
+#build meme rows
 meme_rows = []
 for _, row in meme.iterrows():
     meme_rows.append({
@@ -43,10 +43,10 @@ for _, row in meme.iterrows():
 
 combined = pd.DataFrame(blast_rows + meme_rows)
 
-# ===== FILTER: remove sequences shorter than 4 amino acids =====
+#remove sequences shorter than 4 AAS
 combined = combined[combined["Match"].str.len() >= 4]
 
-# ===== UNIQUE OUTPUT =====
+#unique output
 simple = (
     combined.groupby("Protein")["Match"]
     .apply(lambda x: list(set(x.dropna())))
@@ -54,7 +54,7 @@ simple = (
 )
 simple.to_csv(f"{outdir}/simple_unique_hits.tsv", sep="\t", index=False)
 
-# ===== COMPOSITE SCORING — per unique found sequence =====
+#scoring per unique found sequence
 def score_sequence(group):
     composite = 0.0
     components = []
@@ -87,7 +87,7 @@ def score_sequence(group):
         "Motifs_Matched": "; ".join(group["Motif"].dropna().unique())
     })
 
-# Group by Protein + Match (the actual found sequence) instead of Protein + Motif
+#group by protein + found sequence instead of protein + motif
 scores = (
     combined.groupby(["Protein", "Match"])
     .apply(score_sequence)

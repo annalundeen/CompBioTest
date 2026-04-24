@@ -1,8 +1,7 @@
 import sys
 import pandas as pd
 
-# assume you already generated MEME results like before
-# here we just standardize output
+#this just cleans meme results a bit- probs combine with other script
 
 input_file = sys.argv[1]
 output_file = sys.argv[2]

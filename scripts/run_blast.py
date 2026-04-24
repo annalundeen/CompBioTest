@@ -64,11 +64,11 @@ def get_seq(row):
 blast_df["Match"] = blast_df.apply(get_seq, axis=1)
 blast_df.to_csv(f"{outdir}/blast_results.tsv", sep="\t", index=False)
 
-# ===== MSA — restored gap penalties, identity/similarity, aligned strings =====
+#alignment with gap penaltys + identity/similarity
 aligner = Align.PairwiseAligner()
 aligner.substitution_matrix = substitution_matrices.load("BLOSUM62")
-aligner.open_gap_score = -11        # restored
-aligner.extend_gap_score = -1       # restored
+aligner.open_gap_score = -11
+aligner.extend_gap_score = -1
 aligner.mode = "local"
 
 blosum62 = substitution_matrices.load("BLOSUM62")
@@ -81,8 +81,8 @@ for _, row in blast_df.iterrows():
     for motif in motifs:
         aln = next(iter(aligner.align(motif, blast_hit_seq)))
 
-        aligned_motif = aln[0]      # restored
-        aligned_hit = aln[1]        # restored
+        aligned_motif = aln[0]
+        aligned_hit = aln[1]
 
         comparable = sum(1 for a, b in zip(aligned_motif, aligned_hit) if a != "-" and b != "-")
         identities = sum(a == b for a, b in zip(aligned_motif, aligned_hit) if a != "-" and b != "-")

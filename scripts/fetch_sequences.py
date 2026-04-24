@@ -34,9 +34,6 @@ def parse_input(file):
 
     return proteins, motifs
 
-
-
-
 def fetch_fasta(uniprot_id):
     url = f"https://rest.uniprot.org/uniprotkb/{uniprot_id}.fasta"
     r = requests.get(url)
@@ -60,7 +57,7 @@ for name, uid in proteins.items():
 os.makedirs(os.path.dirname(output_fasta), exist_ok=True)
 SeqIO.write(records, output_fasta, "fasta")
 
-# also save motifs separately
+#save motifs separately too just in case
 motif_path = os.path.join(os.path.dirname(output_fasta), "motifs.txt")
 
 with open(output_motifs, "w") as f:

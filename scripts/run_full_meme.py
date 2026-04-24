@@ -10,9 +10,7 @@ output_file = sys.argv[4]
 
 os.makedirs("results/meme", exist_ok=True)
 
-########################
-# LOAD DATA
-########################
+#load data
 
 motifs = [line.strip() for line in open(motif_file)]
 
@@ -23,9 +21,7 @@ sequences = {
 
 msa_df = pd.read_csv(msa_file, sep="\t")
 
-########################
-# CREATE STRICT MOTIFS
-########################
+#create strict motifs
 
 def write_strict(motifs, out):
     alphabet = "ACDEFGHIKLMNPQRSTVWY"
@@ -43,7 +39,7 @@ def write_strict(motifs, out):
 
 write_strict(motifs, "results/meme/strict.meme")
 
-# Replace build_flexible and write_flexible with these:
+#build flexible
 
 def build_flexible(msa_df):
     """Position-aware flexible dict matching old make_filtered_dict logic."""
@@ -63,7 +59,6 @@ def build_flexible(msa_df):
 
 
 def make_prob_matrix(motif, filtered_dict):
-    """Restored from old code — position-aware probability matrix."""
     alphabet = "ACDEFGHIKLMNPQRSTVWY"
     count_matrix = pd.DataFrame(0, index=range(len(motif)), columns=list(alphabet))
 
@@ -106,16 +101,14 @@ write_flexible(flex_dict, "results/meme/flexible.meme")
 
 import subprocess
 
-########################
-# RUN FIMO (CLI VERSION)
-########################
+#run CLI version of fimo
 
 def run_fimo(meme_file, label):
     out_dir = f"results/meme/fimo_{label}"
     
     os.makedirs(out_dir, exist_ok=True)
 
-    # Run FIMO from command line
+    #running fimo on command line
     subprocess.run([
         "fimo",
         "--oc", out_dir,
@@ -123,12 +116,12 @@ def run_fimo(meme_file, label):
         fasta_file
     ], check=True)
 
-    # Load results
+    #load results
     fimo_file = os.path.join(out_dir, "fimo.tsv")
 
     df = pd.read_csv(fimo_file, sep="\t", comment="#")
 
-    # Rename columns to match your pipeline
+    #rename columns to match pipeline
     df = df.rename(columns={
         "sequence_name": "Protein",
         "start": "Start",
@@ -141,11 +134,11 @@ def run_fimo(meme_file, label):
 
     return df
 
-# Run both motif sets
+#run both motif sets (strict and flexible)
 df_strict = run_fimo("results/meme/strict.meme", "strict")
 df_flex = run_fimo("results/meme/flexible.meme", "flex")
 
-# Combine results
+#c
 df = pd.concat([df_strict, df_flex])
 df["Method"] = "MEME"
 
